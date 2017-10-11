@@ -10,23 +10,25 @@ subroutine WENO(lambda,F,q,R_i,Rinv_i,hp_i,hn_i)
   integer :: n_x,i
   real,dimension(3,3) :: R_i,Rinv_i
 
-  do i=1,6
-    w_i(i,1) = Rinv_i(1,1) * q(i,1) + Rinv_i(1,2) * q(i,2) + Rinv_i(1,3) * q(i,3)
-    w_i(i,2) = Rinv_i(2,1) * q(i,1) + Rinv_i(2,2) * q(i,2) + Rinv_i(2,3) * q(i,3)
-    w_i(i,3) = Rinv_i(3,1) * q(i,1) + Rinv_i(3,2) * q(i,2) + Rinv_i(3,3) * q(i,3)
-
-    g_i(i,1) = Rinv_i(1,1) * F(i,1) + Rinv_i(1,2) * F(i,2) + Rinv_i(1,3) * F(i,3)
-    g_i(i,2) = Rinv_i(2,1) * F(i,1) + Rinv_i(2,2) * F(i,2) + Rinv_i(2,3) * F(i,3)
-    g_i(i,3) = Rinv_i(3,1) * F(i,1) + Rinv_i(3,2) * F(i,2) + Rinv_i(3,3) * F(i,3)
-
-  end do
+  ! do i=1,6
+  !   w_i(i,1) = Rinv_i(1,1) * q(i,1) + Rinv_i(1,2) * q(i,2) + Rinv_i(1,3) * q(i,3)
+  !   w_i(i,2) = Rinv_i(2,1) * q(i,1) + Rinv_i(2,2) * q(i,2) + Rinv_i(2,3) * q(i,3)
+  !   w_i(i,3) = Rinv_i(3,1) * q(i,1) + Rinv_i(3,2) * q(i,2) + Rinv_i(3,3) * q(i,3)
+  !
+  !   g_i(i,1) = Rinv_i(1,1) * F(i,1) + Rinv_i(1,2) * F(i,2) + Rinv_i(1,3) * F(i,3)
+  !   g_i(i,2) = Rinv_i(2,1) * F(i,1) + Rinv_i(2,2) * F(i,2) + Rinv_i(2,3) * F(i,3)
+  !   g_i(i,3) = Rinv_i(3,1) * F(i,1) + Rinv_i(3,2) * F(i,2) + Rinv_i(3,3) * F(i,3)
+  !
+  ! end do
+  w_i = q
+  g_i = F
 
 
   v_i = 0.5 * (g_i + lambda*w_i)
 
   temp = 0.5 * (g_i - lambda*w_i)
 
-  u_i = turn(temp,6,-1)
+  u_i = turnx(temp,6,-1)
 
   ! Right flux
   ! compute u_{i+1/2}^{+}
@@ -105,13 +107,15 @@ subroutine WENO(lambda,F,q,R_i,Rinv_i,hp_i,hn_i)
   hn = w0n*p0n + w1n*p1n + w2n*p2n
 
 
-  hp_i(1,1) = R_i(1,1) * hp(1,1) + R_i(1,2) * hp(1,2) + R_i(1,3) * hp(1,3)
-  hp_i(1,2) = R_i(2,1) * hp(1,1) + R_i(2,2) * hp(1,2) + R_i(2,3) * hp(1,3)
-  hp_i(1,3) = R_i(3,1) * hp(1,1) + R_i(3,2) * hp(1,2) + R_i(3,3) * hp(1,3)
-
-  hn_i(1,1) = R_i(1,1) * hn(1,1) + R_i(1,2) * hn(1,2) + R_i(1,3) * hn(1,3)
-  hn_i(1,2) = R_i(2,1) * hn(1,1) + R_i(2,2) * hn(1,2) + R_i(2,3) * hn(1,3)
-  hn_i(1,3) = R_i(3,1) * hn(1,1) + R_i(3,2) * hn(1,2) + R_i(3,3) * hn(1,3)
+  ! hp_i(1,1) = R_i(1,1) * hp(1,1) + R_i(1,2) * hp(1,2) + R_i(1,3) * hp(1,3)
+  ! hp_i(1,2) = R_i(2,1) * hp(1,1) + R_i(2,2) * hp(1,2) + R_i(2,3) * hp(1,3)
+  ! hp_i(1,3) = R_i(3,1) * hp(1,1) + R_i(3,2) * hp(1,2) + R_i(3,3) * hp(1,3)
+  !
+  ! hn_i(1,1) = R_i(1,1) * hn(1,1) + R_i(1,2) * hn(1,2) + R_i(1,3) * hn(1,3)
+  ! hn_i(1,2) = R_i(2,1) * hn(1,1) + R_i(2,2) * hn(1,2) + R_i(2,3) * hn(1,3)
+  ! hn_i(1,3) = R_i(3,1) * hn(1,1) + R_i(3,2) * hn(1,2) + R_i(3,3) * hn(1,3)
+  hp_i = hp
+  hn_i = hn
 
 
   return
