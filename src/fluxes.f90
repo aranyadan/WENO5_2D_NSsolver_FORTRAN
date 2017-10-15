@@ -33,7 +33,7 @@ contains
 
   function turnx(F,n_x,times)
     integer :: n_x,times
-    real,dimension(n_x,3) :: F,F_new,turn
+    real,dimension(n_x,4) :: F,F_new,turn
     if(times == 0) then
       turn = F
     else

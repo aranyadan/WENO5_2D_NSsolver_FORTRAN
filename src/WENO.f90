@@ -1,14 +1,14 @@
 subroutine WENO(lambda,F,q,R_i,Rinv_i,hp_i,hn_i)
   use flux
   implicit none
-  real,dimension(1,3) :: u,v,umm,um,up,upp,vmm,vm,vp,vpp,p0n,p1n,p2n,B0n,B1n
-  real,dimension(1,3) :: B2n,alpha0n,alpha1n,alpha2n,alphasumn,w0n,w1n,w2n,hn
-  real,dimension(1,3) :: p0p,p1p,p2p,B0p,B1p,B2p,alpha0p,alpha1p,alpha2p
-  real,dimension(1,3) :: alphasump,w0p,w1p,w2p,hp,res,res1,res2,hp_i,hn_i
-  real,dimension(6,3) :: F,q,u_i,v_i,g_i,w_i,temp
+  real,dimension(1,4) :: u,v,umm,um,up,upp,vmm,vm,vp,vpp,p0n,p1n,p2n,B0n,B1n
+  real,dimension(1,4) :: B2n,alpha0n,alpha1n,alpha2n,alphasumn,w0n,w1n,w2n,hn
+  real,dimension(1,4) :: p0p,p1p,p2p,B0p,B1p,B2p,alpha0p,alpha1p,alpha2p
+  real,dimension(1,4) :: alphasump,w0p,w1p,w2p,hp,res,res1,res2,hp_i,hn_i
+  real,dimension(6,4) :: F,q,u_i,v_i,g_i,w_i,temp
   real :: d0n,d0p,d1n,d1p,d2n,d2p,lambda,epsilon
   integer :: n_x,i
-  real,dimension(3,3) :: R_i,Rinv_i
+  real,dimension(4,4) :: R_i,Rinv_i
 
   ! do i=1,6
   !   w_i(i,1) = Rinv_i(1,1) * q(i,1) + Rinv_i(1,2) * q(i,2) + Rinv_i(1,3) * q(i,3)
