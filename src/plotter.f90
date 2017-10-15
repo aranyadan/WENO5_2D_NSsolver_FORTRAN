@@ -74,7 +74,7 @@ contains
     write(100,'(a,i4.4,a,f6.4,a)') "plt.title('Frame ",id,", time = ",t,"')"
     write(100,'(a)') "plt.xlabel('x')"
     write(100,'(a)') "plt.xlabel('y')"
-    write(100,'(a)') 'plt.contourf(Z,100)'
+    write(100,'(a)') 'plt.contour(Z,100)'
     write(100,'(a,a,i4.4,a)') 'plt.savefig(''./plots/',trim(property),id,'.png'')'
 
     close(100)

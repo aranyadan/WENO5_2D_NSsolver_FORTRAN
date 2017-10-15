@@ -8,7 +8,7 @@ program main
   integer,parameter :: n_x = 101, n_y =101, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0
   real, parameter :: startx = 0, endx = 1, starty = 0, endy = 1, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,lambda,t,dt_0
-  integer :: I,id=0,check
+  integer :: I,id=0,check,case_id
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
@@ -23,14 +23,15 @@ program main
   y = (/ (starty + (I-1)*dely,I = 1,n_y) /)
 
   print*,'Setting initial conditions'
-  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y)
+  case_id = 3
+  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,cfl,tend)
   print*,'Initial conditions Set'
 
   q = q_0
   a_0 = SQRT(gamma*Prim_0(:,:,3)/Prim_0(:,:,4))
   lambda_0 = MAXVAL(MAXVAL( ABS( Prim_0(:,:,1) )+a_0,1))
   dt_0 = cfl * delx/lambda_0
-  print*,dt_0
+
   !! Solver Loop
   Prim = Prim_0
   q = q_0
@@ -46,7 +47,7 @@ program main
   end if
 
   print*,'Starting time stepping'
-! t=tend
+
   do while (t < tend)
     ! Starting RK
     qo = q

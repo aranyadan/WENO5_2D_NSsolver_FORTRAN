@@ -28,7 +28,8 @@ subroutine WENO(lambda,F,q,R_i,Rinv_i,hp_i,hn_i)
 
   temp = 0.5 * (g_i - lambda*w_i)
 
-  u_i = turnx(temp,6,-1)
+  ! u_i = turnx(temp,6,-1)
+
 
   ! Right flux
   ! compute u_{i+1/2}^{+}
@@ -71,11 +72,11 @@ subroutine WENO(lambda,F,q,R_i,Rinv_i,hp_i,hn_i)
 
   ! Left Flux
   ! compute u_{i+1/2}^{-}
-  umm(1,:) = u_i(1,:)
-  um(1,:)  = u_i(2,:)
-  u(1,:)   = u_i(3,:)
-  up(1,:)  = u_i(4,:)
-  upp(1,:) = u_i(5,:)
+  umm(1,:) = temp(2,:)
+  um(1,:)  = temp(3,:)
+  u(1,:)   = temp(4,:)
+  up(1,:)  = temp(5,:)
+  upp(1,:) = temp(6,:)
 
   ! Polynomials
   p0n = ( -umm + 5.0*um + 2.0*u  )/6.0
