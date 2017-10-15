@@ -19,7 +19,7 @@ contains
       else
         do i = 1,n_y
           if (mod(i+times,n_y)>0) then
-            F_new(:,mod(i+times,n_x),:) = F(:,i,:)
+            F_new(:,mod(i+times,n_y),:) = F(:,i,:)
           else
             F_new(:,n_y,:) = F(:,i,:)
           end if

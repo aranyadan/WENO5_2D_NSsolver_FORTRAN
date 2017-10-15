@@ -11,7 +11,7 @@ MODDIR = ./mod/
 
 ### compiler
 F90 = f95
-COMMONFLAGS  =  -O3
+COMMONFLAGS  =  -O4 
 COMPFLAGS          =  -c  $(COMMONFLAGS)
 LINKFLAGS             =       $(COMMONFLAGS)
 

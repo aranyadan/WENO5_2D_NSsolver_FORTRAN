@@ -5,7 +5,7 @@ program main
   use transform
   implicit none
   ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
-  integer,parameter :: n_x = 101, n_y =101, SAVE=1,PLOT=0,PLOTVAL=3,VIDEO=0
+  integer,parameter :: n_x = 101, n_y =101, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0
   real, parameter :: startx = 0, endx = 1, starty = 0, endy = 1, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,lambda,t,dt_0
   integer :: I,id=0,check
@@ -17,7 +17,7 @@ program main
   delx = abs(endx-startx)/(n_x-1)
   dely = abs(endy-starty)/(n_y-1)
   cfl = 0.475
-  tend = 0.05
+  tend = 0.3
 
   x = (/ (startx + (I-1)*delx,I = 1,n_x) /)
   y = (/ (starty + (I-1)*dely,I = 1,n_y) /)
@@ -30,7 +30,7 @@ program main
   a_0 = SQRT(gamma*Prim_0(:,:,3)/Prim_0(:,:,4))
   lambda_0 = MAXVAL(MAXVAL( ABS( Prim_0(:,:,1) )+a_0,1))
   dt_0 = cfl * delx/lambda_0
-
+  print*,dt_0
   !! Solver Loop
   Prim = Prim_0
   q = q_0
@@ -46,16 +46,14 @@ program main
   end if
 
   print*,'Starting time stepping'
-
+! t=tend
   do while (t < tend)
-    print*,'next'
     ! Starting RK
     qo = q
 
     ! RK 1st step
     call build_flux(q,n_x,n_y,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
-    print*, 'Succes!!!'
     dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
     dG = ((hp - turn(hp,n_x,n_y,1,2)) + (hn - turn(hn,n_x,n_y,1,2)))/dely
@@ -108,7 +106,6 @@ program main
       dt = tend-t
     end if
     t=t+dt
-    print*,'Starting data saving'
     if(PLOT==1) then
       check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
       id=id+1
@@ -116,7 +113,9 @@ program main
       check=save_data(q,x,y,n_x,n_y,t,id)
       id=id+1
     end if
-    print *, 'id=',id
+    if(MOD(id,20)==0) then
+      write( *, '(a,i4,a,f6.4)')'Writing file id: ', id,'    Time = ',t
+    end if
 
   end do
 if(VIDEO==1) then

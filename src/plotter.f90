@@ -25,7 +25,7 @@ contains
     open(unit = 100,file = fname)
     do j=1,n_y
       do i=1,n_x
-        write(100,*)x(i),y(j),u(i,j),v(i,j),p(i,j),rho(i,j),M(i,j)
+        write(100,*)x(i),y(j),u(i,j),v(i,j),p(i,j),rho(i,j)
       end do
     end do
     close(100)
@@ -47,34 +47,39 @@ contains
 
     select case (val)
       case(1)
-        property='velocity'
+        property='u velocity'
       case(2)
-        property='pressure'
+        property='v velocity'
       case(3)
-        property='density'
+        property='pressure'
       case(4)
-        property='Mach_number'
+        property='density'
       case default
         property='y'
     end select
 
     ! Create the gnuplot file
-    open(unit = 100,file='./plots/1plotter.plt')
+    open(unit = 100,file='./plots/1plot.py')
 
-    write(100,*) 'set term png'
-    write(100, '(a,a,i4.4,a)' ) " set output ""./plots/",trim(property),id,".png"""
-    write(100,*)'set xlabel "x"'
-    write(100,*)'set ylabel "',trim(property),'"'
-    write(100,'(a,i4.4,a,f6.4,a)') " m=""./data/frame",id,"t_",t,".dat"""
-    ! write(100,*)'set terminal x11 0'
-    write(100,*)'set nokey'
-    write(100,*)'set grid'
-    write(100, '(a,i4.4,a,f6.4,a)' ) " set title 'Frame ",id,", time = ",t,"'"
-    write(100, '(a,i4.4,a)' ) " plot m using 1:",val+1," with linespoints"
+    write(100,'(a)') 'import numpy as np'
+    write(100,'(a)') 'import matplotlib.pyplot as plt'
+    write(100,'(a,i4.4,a,f6.4,a)') "fname = ""./data/frame",id,"t_",t,".dat"""
+    write(100,'(a)') 'data = np.loadtxt(fname)'
+    write(100,'(a,i4)')'nx = ',n_x
+    write(100,'(a,i4)')'ny = ',n_y
+    write(100,'(a,i1,a)')'Z = np.reshape(data[:,',val+1,'],(ny,nx))'
+    write(100,'(a)') 'X = np.reshape(data[:,0],(ny,nx))'
+    write(100,'(a)') 'Y = np.reshape(data[:,1],(ny,nx))'
+    write(100,'(3a)') "plt.title('",trim(property),"',loc='left')"
+    write(100,'(a,i4.4,a,f6.4,a)') "plt.title('Frame ",id,", time = ",t,"')"
+    write(100,'(a)') "plt.xlabel('x')"
+    write(100,'(a)') "plt.xlabel('y')"
+    write(100,'(a)') 'plt.contourf(Z,100)'
+    write(100,'(a,a,i4.4,a)') 'plt.savefig(''./plots/',trim(property),id,'.png'')'
 
     close(100)
 
-    call system('gnuplot -p ./plots/1plotter.plt')
+    call system('python ./plots/1plot.py')
   end function plot_data
 
 
