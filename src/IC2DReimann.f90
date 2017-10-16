@@ -8,7 +8,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend)
   real, dimension(n_y) :: y
   real,dimension(n_x,n_y) :: E
 
-
+  tend = 0.3
   select case (case_id)
   case (1)  ! config 1
       p =   (/ 1.0, 0.4,     0.0439,  0.15    /)

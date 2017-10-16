@@ -7,30 +7,32 @@ program main
   ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
   integer,parameter :: n_x = 101, n_y =101, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0
   real, parameter :: startx = 0, endx = 1, starty = 0, endy = 1, gamma = 1.4
-  real :: delx,dely,dt,cfl,tend,lambda_0,lambda,t,dt_0
+  real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta
   integer :: I,id=0,check,case_id
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
+  real,dimension(2) :: lambda_arr, lambda_0_arr
   real, dimension(n_x,n_y,4) :: Prim,Prim_0,q_0,q,qo,dF,hp,hn,g,f,dL,dG       ! Stores primitive values and flux values
 
   delx = abs(endx-startx)/(n_x-1)
   dely = abs(endy-starty)/(n_y-1)
+  delta = MINVAL((/ delx,dely /))
   cfl = 0.475
-  tend = 0.3
+  ! tend = 0.3
 
   x = (/ (startx + (I-1)*delx,I = 1,n_x) /)
   y = (/ (starty + (I-1)*dely,I = 1,n_y) /)
 
   print*,'Setting initial conditions'
   case_id = 3
-  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,cfl,tend)
+  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend)
   print*,'Initial conditions Set'
 
   q = q_0
   a_0 = SQRT(gamma*Prim_0(:,:,3)/Prim_0(:,:,4))
-  lambda_0 = MAXVAL(MAXVAL( ABS( Prim_0(:,:,1) )+a_0,1))
-  dt_0 = cfl * delx/lambda_0
+  lambda_0 = MAXVAL(MAXVAL( ABS( Prim_0(:,:,1) ) + ABS( Prim_0(:,:,2)) +a_0,1))
+  dt_0 = cfl * delta/lambda_0
 
   !! Solver Loop
   Prim = Prim_0
@@ -101,8 +103,8 @@ program main
     ! Extract primitive values
     call primitives(q,n_x,n_y,rho,u,v,E,p,a)
 
-    lambda = MAXVAL(MAXVAL(ABS(u)+a,1))
-    dt = cfl*delx/lambda
+    lambda = MAXVAL(MAXVAL(ABS(u) + ABS(v) +a,1))
+    dt = cfl*delta/lambda
     if(t+dt>tend) then
       dt = tend-t
     end if
@@ -115,7 +117,7 @@ program main
       id=id+1
     end if
     if(MOD(id,20)==0) then
-      write( *, '(a,i4,a,f6.4)')'Writing file id: ', id,'    Time = ',t
+      write( *, '(a,i4,a,f6.4,a,f6.4)')'Processed file id: ', id,'    Time = ',t,'/',tend
     end if
 
   end do
