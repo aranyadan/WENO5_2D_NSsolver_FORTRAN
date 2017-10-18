@@ -11,12 +11,12 @@ MODDIR = ./mod/
 
 ### compiler
 F90 = f95
-COMMONFLAGS  =  -O4 
+COMMONFLAGS  =  -O4
 COMPFLAGS          =  -c  $(COMMONFLAGS)
 LINKFLAGS             =       $(COMMONFLAGS)
 
 ### objects
-OBJ = IC2DReimann.o plotter.o primitives.o transforms.o fluxes.o WENO.o WENO52d.o main.o
+OBJ = IC2DReimann.o saver.o primitives.o transforms.o fluxes.o WENO.o WENO52d.o main.o
 OBJS = $(addprefix $(OBJDIR), $(OBJ))
 ### compile and link
 

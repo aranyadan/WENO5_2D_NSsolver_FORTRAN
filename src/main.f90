@@ -1,7 +1,7 @@
 ! Main file
 program main
   use flux
-  use plotter
+  use saver
   use transform
   implicit none
   ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
@@ -14,6 +14,7 @@ program main
   real,dimension(n_y) :: y
   real,dimension(2) :: lambda_arr, lambda_0_arr
   real, dimension(n_x,n_y,4) :: Prim,Prim_0,q_0,q,qo,dF,hp,hn,g,f,dL,dG       ! Stores primitive values and flux values
+  character(len=1024) :: plot_caller
 
   delx = abs(endx-startx)/(n_x-1)
   dely = abs(endy-starty)/(n_y-1)
@@ -24,6 +25,7 @@ program main
   x = (/ (startx + (I-1)*delx,I = 1,n_x) /)
   y = (/ (starty + (I-1)*dely,I = 1,n_y) /)
 
+  print*,'!!!!!!---------#########################---------!!!!!!'
   print*,'Setting initial conditions'
   case_id = 3
   call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend)
@@ -40,10 +42,7 @@ program main
   t=0
   dt = dt_0
   lambda = lambda_0
-  if(PLOT==1) then
-    check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
-    id=id+1
-  else if(SAVE==1)then
+  if(SAVE==1)then
     check=save_data(q,x,y,n_x,n_y,t,id)
     id=id+1
   end if
@@ -109,18 +108,27 @@ program main
       dt = tend-t
     end if
     t=t+dt
-    if(PLOT==1) then
-      check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
-      id=id+1
-    else if(SAVE==1)then
+    ! if(PLOT==1) then
+    !   check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
+    !   id=id+1
+    if(SAVE==1)then
       check=save_data(q,x,y,n_x,n_y,t,id)
-      id=id+1
+      if(MOD(id,20)==0) then
+        write( *, '(a,i4,a,f6.4,a,f6.4)')'Written file id: ', id,'    Time = ',t,'/',tend
+      end if
+    else
+      if(MOD(id,20)==0) then
+        write( *, '(a,i4,a,f6.4,a,f6.4)')'Processed file id: ', id,'    Time = ',t,'/',tend
+      end if
     end if
-    if(MOD(id,20)==0) then
-      write( *, '(a,i4,a,f6.4,a,f6.4)')'Processed file id: ', id,'    Time = ',t,'/',tend
-    end if
+    id=id+1
 
   end do
+  if(PLOT == 1 .AND. SAVE == 1) then
+    write(plot_caller,'(a,i4,a,i4,a,i4)') "python ./src/plot_data.py ",n_x," ",n_y," ",PLOTVAL
+    write(*,'(a)') 'Finished processing, calling python routine to start plotting...'
+    call system(plot_caller)
+  end if
 if(VIDEO==1) then
   check=get_video(PLOTVAL)
 end if
