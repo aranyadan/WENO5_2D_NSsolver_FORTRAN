@@ -1,13 +1,4 @@
-function res = WENO5LF2d(a,w,dx,dir)
-
-if dir==1
-    turn=[1 0 0];
-    G = F(w,1);
-else
-    turn=[0 1 0];
-    G = F(w,2);
-end
-
+function res = WENO5LF2d(a,w,G,dx,turn)
 
 v=0.5*(G+a*w); u=circshift(0.5*(G-a*w),-1*turn);
 
@@ -79,20 +70,6 @@ hp = w0p.*p0p + w1p.*p1p + w2p.*p2p;
 
 %% Compute finite volume residual term, df/dx.
 res = (hp-circshift(hp,turn)+hn-circshift(hn,turn))/dx;
-end
 
-% Compute flux vector
-function flux = F(q,i)
-    global gamma
 
-    % primary properties
-    rho=q(:,:,1); u=q(:,:,2)./rho; v=q(:,:,3)./rho; E=q(:,:,4)./rho;
-    p=(gamma-1)*rho.*(E-0.5*(u.^2 + v.^2));
-
-    % flux vector of conserved properties
-    if(i==1)
-        flux=reshape([rho.*u rho.*u.^2+p rho.*u.*v u.*(rho.*E+p)],size(q));
-    else
-        flux=reshape([rho.*v rho.*u.*v rho.*v.^2+p v.*(rho.*E+p)],size(q));
-    end
 end
