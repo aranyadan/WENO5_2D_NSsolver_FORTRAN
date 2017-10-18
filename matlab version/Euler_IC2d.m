@@ -1,10 +1,10 @@
-function [r0,u0,v0,p0,tEnd,cfl] = Euler_IC1d(x,y,~)
+function [r0,u0,v0,p0,tEnd,cfl] = Euler_IC2d(x,y,~)
 fprintf('Setting boundary conditions:\n');
 
 %% Load Selected case Initial condition:
 % Pre-Allocate variables
-r0 = zeros(size(x)); 
-u0 = zeros(size(x)); 
+r0 = zeros(size(x));
+u0 = zeros(size(x));
 v0 = zeros(size(x));
 p0 = zeros(size(x));
 
