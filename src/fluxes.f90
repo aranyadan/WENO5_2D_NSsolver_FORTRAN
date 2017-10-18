@@ -49,23 +49,28 @@ contains
     return
   end function turnx
 
-  subroutine build_flux(q,n_x,n_y,F,G)
+  subroutine build_flux(q,n_x,n_y,delx,dely,Re,Suth,F,G)
     integer :: n_x,n_y
-    real :: gamma=1.4
+    real :: gamma=1.4,Re,Suth
     real, dimension(n_x,n_y,4) :: q,F, G
-    real, dimension(n_x,n_y) :: u,v,p,rho,E,a
+    real, dimension(n_x,n_y) :: u,v,p,rho,E,a,tauxx,tauxy,tauyy
+    real, dimension(n_x,n_y,2) :: vel
 
     call primitives(q,n_x,n_y,rho,u,v,E,p,a)
 
+    vel(:,:,1) = u(:,:)
+    vel(:,:,2) = v(:,:)
+    call viscous_fluxes(vel,p,rho,n_x,n_y,delx,dely,Suth,Re,tauxx,tauyy,tauxy)
+
     F(:,:,1) = rho*u
-    F(:,:,2) = rho*u*u + p
-    F(:,:,3) = rho*u*v
-    F(:,:,4) = rho*u*E + p*u
+    F(:,:,2) = rho*u*u + p - tauxx
+    F(:,:,3) = rho*u*v - tauxy
+    F(:,:,4) = rho*u*E + p*u - u*tauxx - v*tauxy
 
     G(:,:,1) = rho*v
-    G(:,:,2) = rho*u*v
-    G(:,:,3) = rho*v*v +p
-    G(:,:,4) = rho*v*E + p*v
+    G(:,:,2) = rho*u*v - tauxy
+    G(:,:,3) = rho*v*v + p -tauyy
+    G(:,:,4) = rho*v*E + p*v - u*tauxy - v*tauyy
 
   end subroutine build_flux
 

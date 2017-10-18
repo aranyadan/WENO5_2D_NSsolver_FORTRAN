@@ -11,19 +11,8 @@ subroutine WENO52d(lambda,F,q,n_x,n_y,hp,hn,dir)
   real,dimension(4,4) :: R_i,Rinv_i
   real,dimension(1,4) :: q_h,hpr,hnr
 
-  Fnew(1:n_x,1:n_y,:) = F(1:n_x,1:n_y,:)
-  qnew(1:n_x,1:n_y,:) = q(1:n_x,1:n_y,:)
-
-  qnew(-1,:,:) = qnew(1,:,:); qnew(0,:,:) = qnew(1,:,:)
-  qnew(:,-1,:) = qnew(:,1,:); qnew(:,0,:) = qnew(:,1,:)
-  qnew(n_x+1,:,:) = qnew(n_x,:,:); qnew(n_x+2,:,:) = qnew(n_x,:,:); qnew(n_x+3,:,:) = qnew(n_x,:,:);
-  qnew(:,n_y+1,:) = qnew(:,n_y,:); qnew(:,n_y+2,:) = qnew(:,n_y,:); qnew(:,n_y+3,:) = qnew(:,n_y,:);
-
-  Fnew(-1,:,:) = Fnew(1,:,:); Fnew(0,:,:) = Fnew(1,:,:)
-  Fnew(:,-1,:) = Fnew(:,1,:); Fnew(:,0,:) = Fnew(:,1,:)
-  Fnew(n_x+1,:,:) = Fnew(n_x,:,:); Fnew(n_x+2,:,:) = Fnew(n_x,:,:); Fnew(n_x+3,:,:) = Fnew(n_x,:,:);
-  Fnew(:,n_y+1,:) = Fnew(:,n_y,:); Fnew(:,n_y+2,:) = Fnew(:,n_y,:); Fnew(:,n_y+3,:) = Fnew(:,n_y,:);
-
+  call pad_fluxes(F,Fnew,n_x,n_y,4)
+  call pad_fluxes(q,qnew,n_x,n_y,4)
 
   if (dir==1) then
     do j=1,n_y
@@ -58,10 +47,6 @@ subroutine WENO52d(lambda,F,q,n_x,n_y,hp,hn,dir)
       end do
     end do
   end if
-
-
-
-
 
   return
 end subroutine WENO52d
