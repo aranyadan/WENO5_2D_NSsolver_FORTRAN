@@ -17,7 +17,8 @@ LINKFLAGS             =       $(COMMONFLAGS)
 
 ### objects
 OBJ = IC2DReimann.o pad_fluxes.o saver.o primitives.o transforms.o fluxes.o \
- 			WENO.o WENO52d.o main.o viscous_fluxes.o set_boundary.o
+ 			WENO.o WENO52d.o main.o viscous_fluxes.o set_boundary.o \
+			compute_residual.o
 OBJS = $(addprefix $(OBJDIR), $(OBJ))
 ### compile and link
 

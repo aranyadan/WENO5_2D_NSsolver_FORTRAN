@@ -4,7 +4,7 @@ contains
     integer :: n_x,id
     real :: t,gamma=1.4
     real,dimension(n_x,n_y,4) :: q
-    real,dimension(n_x,n_y) :: u,p,rho,E,a,M,v
+    real,dimension(n_x,n_y) :: u,p,rho,E,a,M,v,Temp
     real, dimension(n_x) :: x
     real, dimension(n_y) :: y
     character(len=5) :: charI
@@ -17,15 +17,16 @@ contains
     p = (gamma-1)*rho*(E-0.5*(u*u+v*v))
     a = SQRT(gamma*p/rho)
     M = u/a
+    Temp = p/rho
 
     write(charI,'(I5)') id
-    write(fname,'(a,i4.4,a,f6.4,a)') "./data/frame",id,"t_",t,".dat"
+    write(fname,'(a,i5.5,a,f7.4,a)') "./data/frame",id,"t_",t,".dat"
 
 
     open(unit = 100,file = fname)
     do j=1,n_y
       do i=1,n_x
-        write(100,*)x(i),y(j),u(i,j),v(i,j),p(i,j),rho(i,j)
+        write(100,*)x(i),y(j),u(i,j),v(i,j),p(i,j),rho(i,j),Temp(i,j)
       end do
     end do
     close(100)
@@ -37,17 +38,19 @@ contains
     character(len=1024) :: property,command
     select case (val)
       case(1)
-        property='velocity'
+        property='u_velocity'
       case(2)
-        property='pressure'
+        property= 'v_velocity'
       case(3)
-        property='density'
+        property='pressure'
       case(4)
-        property='Mach_number'
+        property='density'
+      case(5)
+        property='Temperature'
       case default
         property='y'
     end select
-    write(command,'(a,a,a,a,a)') "avconv -i ""./plots/",trim(property),"%04d.png"" -r 30 ./plots/",trim(property),".mp4"
+    write(command,'(a,a,a,a,a)') "avconv -i ""./plots/",trim(property),"%05d.png"" -r 30 ./plots/",trim(property),".mp4"
     call system(command)
   end function get_video
 end module saver

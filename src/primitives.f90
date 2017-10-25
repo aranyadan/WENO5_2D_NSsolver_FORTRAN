@@ -8,7 +8,7 @@ subroutine primitives(q,n_x,n_y,rho,u,v,E,p,a)
   u = q(:,:,2)/rho
   v = q(:,:,3)/rho
   E = q(:,:,4)/rho
-  p = (gamma-1)*rho*(E-0.5*(u*u+v*v))
+  p = (gamma-1.0)*rho*(E-0.5*(u*u+v*v))
   a = SQRT(gamma*p/rho)
 
 end subroutine primitives

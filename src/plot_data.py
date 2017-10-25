@@ -12,15 +12,16 @@ nx = int(sys.argv[1])
 ny = int(sys.argv[2])
 prop = int(sys.argv[3])
 
-if prop>4 or prop<1 :
-    prop = 4
+if prop>5 or prop<1 :
+    prop = 5
 
 def choose_prop(x):
     return {
-        1 : 'u velocity',
-        2 : 'v velocity',
+        1 : 'u_velocity',
+        2 : 'v_velocity',
         3 : 'pressure',
-        4 : 'density'
+        4 : 'density',
+        5 : 'Temperature'
     }.get(x,'Unknown')
 
 proprty = choose_prop(prop)
@@ -38,7 +39,7 @@ for fil_name in allfiles_sorted:
     plt.ylabel('y')
     plt.contourf(X,Y,Z,30)
     plt.colorbar()
-    plt.savefig( plot_path + proprty + str(frame_no).zfill(4) +'.png')
+    plt.savefig( plot_path + proprty + str(frame_no).zfill(5) +'.png')
     plt.clf()
     frame_no = frame_no +1
     if(frame_no % 10==0):

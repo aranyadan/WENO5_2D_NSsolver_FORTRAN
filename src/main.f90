@@ -5,15 +5,16 @@ program main
   use transform
   implicit none
   ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
-  integer,parameter :: n_x = 51, n_y =51, SAVE=1,PLOT=1,PLOTVAL=1,VIDEO=0, QUIET=0
+  integer,parameter :: n_x = 101, n_y =101, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0, QUIET=1
   real, parameter :: startx = 0, endx = 1, starty = 0, endy = 1, gamma = 1.4
-  real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth
+  real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
+  real :: Pr
   integer :: I,id=0,check,case_id
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
   real,dimension(2) :: lambda_arr, lambda_0_arr
-  real, dimension(n_x,n_y,4) :: Prim,Prim_0,q_0,q,qo,dF,hp,hn,g,f,dL,dG       ! Stores primitive values and flux values
+  real, dimension(n_x,n_y,4) :: Prim,Prim_0,q_0,q,qo,dF,hp,hn,g,f,dL,dG,q_old
   character(len=1024) :: plot_caller
 
   delx = abs(endx-startx)/(n_x-1)
@@ -30,8 +31,8 @@ program main
     print*,'Setting initial conditions'
   end if
   case_id = 3
-  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend,Re,Suth)
-  call set_boundary(q_0,n_x,n_y)
+  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
+  call set_boundary(q_0,x,n_x,n_y,Cv)
   if(QUIET==0) then
     print*,'Initial conditions Set'
   end if
@@ -61,7 +62,7 @@ program main
     qo = q
 
     ! RK 1st step
-    call build_flux(q,n_x,n_y,delx,dely,Re,Suth,f,g)
+    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
     dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
@@ -70,10 +71,10 @@ program main
 
     q = qo - dt*dL
 
-    call set_boundary(q,n_x,n_y)
+    call set_boundary(q,x,n_x,n_y,Cv)
 
     ! RK 2nd step
-    call build_flux(q,n_x,n_y,delx,dely,Re,Suth,f,g)
+    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
     dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
@@ -82,10 +83,10 @@ program main
 
     q = 0.75*qo + 0.25*( q - dt*dL)
 
-    call set_boundary(q,n_x,n_y)
+    call set_boundary(q,x,n_x,n_y,Cv)
 
     ! RK 3rd step
-    call build_flux(q,n_x,n_y,delx,dely,Re,Suth,f,g)
+    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
     dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
@@ -94,29 +95,36 @@ program main
 
     q = (qo + 2.0*( q - dt*dL))/3.0
 
-    call set_boundary(q,n_x,n_y)
+    call set_boundary(q,x,n_x,n_y,Cv)
 
     ! Extract primitive values
     call primitives(q,n_x,n_y,rho,u,v,E,p,a)
+    if(MINVAL(MINVAL(p,1))<0) then
+      write(*,*) 'Negative pressure found'
+      call abort
+    end if
 
     lambda = MAXVAL(MAXVAL(ABS(u) + ABS(v) +a,1))
     dt = cfl*delta/lambda
+
+    call compute_residual(q,qo,residual,n_x,n_y)
     if(t+dt>tend) then
       dt = tend-t
     end if
     t=t+dt
+    write(*,*) id,t,residual
     ! if(PLOT==1) then
     !   check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
     !   id=id+1
-    if(SAVE==1)then
+    if(SAVE==1 .AND. MOD(id,6)==0)then
       check=save_data(q,x,y,n_x,n_y,t,id)
-      if(MOD(id,20)==0) then
-        write( *, '(a,i4,a,f6.4,a,f6.4)')'Written file id: ', id,'    Time = ',t,'/',tend
-      end if
+      ! if(MOD(id,20)==0) then
+      !   write( *, '(a,i4,a,f6.4,a,f6.4)')'Written file id: ', id,'    Time = ',t,'/',tend
+      ! end if
     else
-      if(MOD(id,20)==0 .AND. QUIET==0) then
-        write( *, '(a,i4,a,f6.4,a,f6.4)')'Processed file id: ', id,'    Time = ',t,'/',tend
-      end if
+      ! if(MOD(id,20)==0 .AND. QUIET==0) then
+      !   write( *, '(a,i4,a,f6.4,a,f6.4)')'Processed file id: ', id,'    Time = ',t,'/',tend
+      ! end if
     end if
     id=id+1
 
@@ -126,7 +134,7 @@ program main
     write(*,'(a)') 'Finished processing, calling python routine to start plotting...'
     call system(plot_caller)
   end if
-if(VIDEO==1) then
+if(VIDEO==1 .AND. SAVE == 1 .AND. PLOT == 1) then
   check=get_video(PLOTVAL)
 end if
 end program main
