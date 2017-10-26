@@ -48,7 +48,10 @@ subroutine get_first_deriv(vel,delta,deriv)
   real :: delta
   real, dimension(1,3) :: deriv
 
-  deriv(1,:) = ( (1.0/20.0)*vel(1,:) + (-0.5)*vel(2,:) + (-1.0/3.0)*vel(3,:) &
-               +	vel(4,:) + (-0.25)*vel(5,:) + (1.0/30.0)*vel(6,:) )/delta
+  ! deriv(1,:) = ( (1.0/20.0)*vel(1,:) + (-0.5)*vel(2,:) + (-1.0/3.0)*vel(3,:) &
+  !              +	vel(4,:) + (-0.25)*vel(5,:) + (1.0/30.0)*vel(6,:) )/delta
+
+  deriv(1,:) = ( (1.0/12.0)*vel(1,:) -(2.0/3.0)*vel(2,:) +(2.0/3.0)*vel(4,:) -(1.0/12.0)*vel(5,:) )/(delta)
+
 
 end subroutine get_first_deriv
