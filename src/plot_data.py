@@ -39,7 +39,7 @@ for fil_name in allfiles_sorted:
     plt.ylabel('y')
     plt.contourf(X,Y,Z,30)
     plt.colorbar()
-    plt.savefig( plot_path + proprty + str(frame_no).zfill(5) +'.png')
+    plt.savefig( plot_path + proprty + str(frame_no).zfill(6) +'.png')
     plt.clf()
     frame_no = frame_no +1
     if(frame_no % 10==0):

@@ -20,7 +20,7 @@ contains
     Temp = p/rho
 
     write(charI,'(I5)') id
-    write(fname,'(a,i5.5,a,f7.4,a)') "./data/frame",id,"t_",t,".dat"
+    write(fname,'(a,i6.6,a,f8.4,a)') "./data/frame",id,"t_",t,".dat"
 
 
     open(unit = 100,file = fname)
@@ -50,7 +50,7 @@ contains
       case default
         property='y'
     end select
-    write(command,'(a,a,a,a,a)') "avconv -i ""./plots/",trim(property),"%05d.png"" -r 30 ./plots/",trim(property),".mp4"
+    write(command,'(a,a,a,a,a)') "avconv -i ""./plots/",trim(property),"%06d.png"" -r 30 ./plots/",trim(property),".mp4"
     call system(command)
   end function get_video
 end module saver

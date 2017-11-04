@@ -101,8 +101,8 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     Prim(:,:,4) = 1.0
 
 
-  case (5)              ! Flat plate BL
-    tend = 0.56
+  case (5)              ! Poissuelli Flow
+    tend = 10
     cfl = 0.6
     p_ref = 101325             ! Reference air pressure (N/m^2)
     rho_ref= 1.225             ! Reference air density (kg/m^3)
@@ -112,13 +112,28 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     Re = 100.0;
     Suth = 110.4/T_ref;
     Pr = 0.7
-
-
-
-
     ! Set the primitive variables
+    do i=1,n_x
+      Prim(i,:,1) = (COS(PI*y(:)))**2
+    end do
+    Prim(:,:,2) = 0.0
+    Prim(:,:,3) = 1.0
+    Prim(:,:,4) = 1.0
 
-    Prim(:,:,1) = 0.0
+
+  case(6)
+    tend = 5
+    cfl = 0.6
+    p_ref = 101325             ! Reference air pressure (N/m^2)
+    rho_ref= 1.225             ! Reference air density (kg/m^3)
+    T_ref = p_ref / (rho_ref * R_gas_const);
+    Cp = gamma * R_gas_const / (gamma-1);
+    Cv = Cp - gamma;
+    Re = 10000.0;
+    Suth = 110.4/T_ref;
+    Pr = 0.7
+    ! Set the primitive variables
+    Prim(:,:,1) = 1.0
     Prim(:,:,2) = 0.0
     Prim(:,:,3) = 1.0
     Prim(:,:,4) = 1.0

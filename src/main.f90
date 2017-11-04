@@ -5,11 +5,11 @@ program main
   use transform
   implicit none
   ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
-  integer,parameter :: n_x = 101, n_y =101, SAVE=1,PLOT=1,PLOTVAL=1,VIDEO=1, QUIET=1
+  integer,parameter :: n_x = 51, n_y =51, SAVE=1,PLOT=1,PLOTVAL=1,VIDEO=0, QUIET=1
   real, parameter :: starty = -0.5, endy = 0.5, startx = 0, endx = 1, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
   real :: Pr
-  integer :: I,id=0,check,case_id
+  integer :: I,id=0,check,case_id=6,skips=500
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
@@ -30,9 +30,9 @@ program main
     print*,'!!!!!!---------#########################---------!!!!!!'
     print*,'Setting initial conditions'
   end if
-  case_id = 4
+
   call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
-  call set_boundary(q_0,x,n_x,n_y,Cv,case_id)
+  call set_boundary(q_0,x,y,n_x,n_y,Cv,case_id)
   if(QUIET==0) then
     print*,'Initial conditions Set'
   end if
@@ -74,7 +74,7 @@ program main
 
     q = qo - dt*dL
 
-    call set_boundary(q,x,n_x,n_y,Cv,case_id)
+    call set_boundary(q,x,y,n_x,n_y,Cv,case_id)
 
     ! RK 2nd step
     call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
@@ -86,7 +86,7 @@ program main
 
     q = 0.75*qo + 0.25*( q - dt*dL)
 
-    call set_boundary(q,x,n_x,n_y,Cv,case_id)
+    call set_boundary(q,x,y,n_x,n_y,Cv,case_id)
 
     ! RK 3rd step
     call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
@@ -98,7 +98,7 @@ program main
 
     q = (qo + 2.0*( q - dt*dL))/3.0
 
-    call set_boundary(q,x,n_x,n_y,Cv,case_id)
+    call set_boundary(q,x,y,n_x,n_y,Cv,case_id)
 
     ! Extract primitive values
     call primitives(q,n_x,n_y,rho,u,v,E,p,a)
@@ -119,7 +119,7 @@ program main
     ! if(PLOT==1) then
     !   check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
     !   id=id+1
-    if(SAVE==1 .AND. MOD(id,100)==0)then
+    if(SAVE==1 .AND. (MOD(id,skips)==0 .OR. t==tend ))then
       check=save_data(q,x,y,n_x,n_y,t,id)
       ! if(MOD(id,20)==0) then
       !   write( *, '(a,i4,a,f6.4,a,f6.4)')'Written file id: ', id,'    Time = ',t,'/',tend
