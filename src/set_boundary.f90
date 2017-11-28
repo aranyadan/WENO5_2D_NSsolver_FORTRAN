@@ -81,14 +81,13 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
 
     ! Lower wall
     temp = NINT(0.3*n_x)
-    E(temp:n_x,2) = 1.0/(gamma-1.0)
-    rho(temp:n_x,1) = 1.0
     u(1:temp,1) = u(1:temp,2)
+    ! E(temp:n_x,2) = 1.0/(gamma-1.0)
+    rho(temp:n_x,2) = 1.0
     u(temp:n_x,1) = -1.0 * u(temp:n_x,2)
     v(temp:n_x,1) = -1.0 * v(temp:n_x,2)
     E(temp:n_x,1) = E(temp:n_x,2)
-    rho(temp:n_x,2) = rho(temp:n_x,1)
-
+    rho(temp:n_x,1) = rho(temp:n_x,2)
 
     ! Outflow
     ! E(n_x,:) = 1.0/((gamma-1.0)*rho(n_x,:)) + 0.5*(u(n_x,:)**2 + v(n_x,:)**2)

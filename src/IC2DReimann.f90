@@ -129,7 +129,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     T_ref = p_ref / (rho_ref * R_gas_const);
     Cp = gamma * R_gas_const / (gamma-1);
     Cv = Cp - gamma;
-    Re = 10000.0;
+    Re = 100.0;
     Suth = 110.4/T_ref;
     Pr = 0.7
     ! Set the primitive variables
