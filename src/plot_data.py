@@ -37,7 +37,7 @@ for fil_name in allfiles_sorted:
     plt.title(fil_name)
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.contour(X,Y,Z,30)
+    plt.contour(X,Y,Z,50,cmap=plt.cm.gray)
     plt.colorbar()
     plt.savefig( plot_path + proprty + str(frame_no).zfill(6) +'.png')
     plt.clf()

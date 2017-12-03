@@ -111,6 +111,8 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     !Adiabatic
     p(1,:) = (p(2,:)/rho(2,:))*rho(1,:)
     p(n_x,:) = (p(n_x-1,:)/rho(n_x-1,:))*rho(n_x,:)
+    p(:,1) = (p(:,2)/rho(:,2))*rho(:,1)
+
 
     E = p/((gamma-1.0)*rho) + 0.5*(u**2+v**2)
   end select

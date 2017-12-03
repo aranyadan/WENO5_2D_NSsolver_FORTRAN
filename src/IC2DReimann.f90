@@ -140,7 +140,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
 
   case(7)                 ! 2D Viscous shock tube SWBLI
     tend = 1
-    cfl = 0.475
+    cfl = 1.1
     p_ref = 101325             ! Reference air pressure (N/m^2)
     rho_ref= 1.225             ! Reference air density (kg/m^3)
     T_ref = p_ref / (rho_ref * R_gas_const);
