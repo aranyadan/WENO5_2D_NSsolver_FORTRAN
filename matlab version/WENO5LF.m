@@ -8,8 +8,8 @@ global Pr
 %% Parameters
 CFL     = 0.75;	% CFL number
 tFinal	= 0.80;	% Final time
-nEx      = 250;  % Number of cells in x
-nEy      = 250;  % Number of cells in y
+nEx      = 50;  % Number of cells in x
+nEy      = 50;  % Number of cells in y
 gamma   = 1.4;  % Ratio of specific heats for ideal di-atomic gas
 IC      = 3;	% 10 IC cases are available
 plot_fig= 1;
@@ -111,8 +111,8 @@ while t<tFinal
         display(['t=',num2str(t),', iterations=',num2str(it)]);
     end
 
-%     cla;fdisplay(Xact,Yact,rho);title(['t=' num2str(t)]); id=id+1;
-%     pause(0.001)
+    cla;fdisplay(Xact,Yact,rho);title(['t=' num2str(t)]); id=id+1;
+    pause(0.001)
 %     print(['./plots/',num2str(id)],'-dpng')
 
 end

@@ -94,21 +94,25 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     rho(n_x,:) = rho(n_x-1,:)
 
   case(7)
+    ! Reflection
+    u(:,n_y) = u(:,n_y-1)
+    v(:,n_y) = v(:,n_y-1)
+    p(:,n_y) = p(:,n_y-1)
+    rho(:,n_y) = rho(:,n_y-1)
+
     ! Noslip
-    u(:,n_y) = 0
-    v(:,n_y) = 0
     u(1,:) = 0
     v(1,:) = 0
     u(n_x,:) = 0
     v(n_x,:) = 0
     u(:,1) = 0
     v(:,1) = 0
-    
+
     !Adiabatic
     p(1,:) = (p(2,:)/rho(2,:))*rho(1,:)
-    p(n_x,:) = (p(n_x,:)/rho(n_x,:))*rho(n_x,:)
+    p(n_x,:) = (p(n_x-1,:)/rho(n_x-1,:))*rho(n_x,:)
 
-
+    E = p/((gamma-1.0)*rho) + 0.5*(u**2+v**2)
   end select
 
   q(:,:,1) = rho(:,:)

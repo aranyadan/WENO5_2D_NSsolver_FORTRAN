@@ -9,7 +9,7 @@ program main
   real, parameter :: starty = -0.5, endy = 0.5, startx = 0, endx = 1, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
   real :: Pr
-  integer :: I,id=0,check,case_id=7,skips=10000
+  integer :: I,id=0,check,case_id=7,skips=100
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
