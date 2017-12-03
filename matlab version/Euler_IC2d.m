@@ -54,6 +54,25 @@ switch IC
 
         tEnd = 0.3;
         cfl = 0.475;
+        
+    case 3
+        % Half 1
+        a = find(x(:,1) >= 0.5 * x(end,1));
+        r0(a,:) = 1.2;
+        u0(a,:) = 0;
+        v0(a,:) = 0;
+        p0(a,:) = 1.2/1.4;
+
+        % Half 2
+        a = find(x(:,1)  < 0.5 * x(end,1));
+        r0(a,:) = 120;
+        u0(a,:) = 0;
+        v0(a,:) = 0;
+        p0(a,:) = 120/1.4;
+
+
+        tEnd = 1.0;
+        cfl = 0.475;
 end
 
 %% Display

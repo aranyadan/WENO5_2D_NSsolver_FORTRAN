@@ -5,11 +5,11 @@ program main
   use transform
   implicit none
   ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
-  integer,parameter :: n_x = 51, n_y =51, SAVE=1,PLOT=1,PLOTVAL=1,VIDEO=0, QUIET=1
+  integer,parameter :: n_x = 251, n_y =251, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0, QUIET=1
   real, parameter :: starty = -0.5, endy = 0.5, startx = 0, endx = 1, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
   real :: Pr
-  integer :: I,id=0,check,case_id=6,skips=50
+  integer :: I,id=0,check,case_id=7,skips=10000
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y

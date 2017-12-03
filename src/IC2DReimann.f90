@@ -121,7 +121,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     Prim(:,:,4) = 1.0
 
 
-  case(6)
+  case(6)               ! Flat plat boundary layer
     tend = 5
     cfl = 0.6
     p_ref = 101325             ! Reference air pressure (N/m^2)
@@ -137,6 +137,38 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     Prim(:,:,2) = 0.0
     Prim(:,:,3) = 1.0
     Prim(:,:,4) = 1.0
+
+  case(7)                 ! 2D Viscous shock tube SWBLI
+    tend = 1
+    cfl = 0.475
+    p_ref = 101325             ! Reference air pressure (N/m^2)
+    rho_ref= 1.225             ! Reference air density (kg/m^3)
+    T_ref = p_ref / (rho_ref * R_gas_const);
+    Cp = gamma * R_gas_const / (gamma-1);
+    Cv = Cp - gamma;
+    Re = 200.0;
+    Suth = 110.4/T_ref;
+    Pr = 0.72
+
+    p =   (/ 120.0/gamma, 1.2/gamma,0.0,0.0   /)
+    rho = (/ 120.0, 1.2,0.0,0.0  /)
+    u =   (/ 0.0, 0.0,0.0,0.0    /)
+    v =   (/ 0.0, 0.0,0.0,0.0  /)
+
+
+    ! Set the primitive variables
+    ! First half
+    mid_x =(n_x+1)/2
+
+    Prim(1:mid_x, :, 1) = u(1)
+    Prim(1:mid_x, :, 2) = v(1)
+    Prim(1:mid_x, :, 3) = p(1)
+    Prim(1:mid_x, :, 4) = rho(1)
+    ! 2nd Half
+    Prim(mid_x+1:n_x, :, 1) = u(2)
+    Prim(mid_x+1:n_x, :, 2) = v(2)
+    Prim(mid_x+1:n_x, :, 3) = p(2)
+    Prim(mid_x+1:n_x, :, 4) = rho(2)
 
 
   end select

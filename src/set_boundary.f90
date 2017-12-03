@@ -93,6 +93,20 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     E(n_x,:) = E(n_x-1,:)
     rho(n_x,:) = rho(n_x-1,:)
 
+  case(7)
+    ! Noslip
+    u(:,n_y) = 0
+    v(:,n_y) = 0
+    u(1,:) = 0
+    v(1,:) = 0
+    u(n_x,:) = 0
+    v(n_x,:) = 0
+    u(:,1) = 0
+    v(:,1) = 0
+    
+    !Adiabatic
+    p(1,:) = (p(2,:)/rho(2,:))*rho(1,:)
+    p(n_x,:) = (p(n_x,:)/rho(n_x,:))*rho(n_x,:)
 
 
   end select

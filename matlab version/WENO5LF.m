@@ -3,13 +3,15 @@ global gamma
 global R_gas_const
 global Suth_const
 global Re
+global Pr
+
 %% Parameters
 CFL     = 0.75;	% CFL number
 tFinal	= 0.80;	% Final time
-nEx      = 50;  % Number of cells in x
-nEy      = 50;  % Number of cells in y
+nEx      = 250;  % Number of cells in x
+nEy      = 250;  % Number of cells in y
 gamma   = 1.4;  % Ratio of specific heats for ideal di-atomic gas
-IC      = 1;	% 10 IC cases are available
+IC      = 3;	% 10 IC cases are available
 plot_fig= 1;
 
 R_gas_const = 287;
@@ -18,9 +20,9 @@ rho_ref= 1.225;             % Reference air density (kg/m^3)
 T_ref = p_ref / (rho_ref * R_gas_const);
 Cp = gamma * R_gas_const / (gamma-1);
 Cv = Cp - gamma;
-Re = 200;
+Re = 1000;
 Suth_const = 110.4/T_ref;
-
+Pr=0.73;
 
 % Discretize spatial domain
 a=0; b=1; dx=(b-a)/nEx; nx=nEx+1; x=linspace(a,b,nx);
@@ -40,7 +42,7 @@ Yact = Y;
 delta = abs(Yact(1,1) - Yact(1,2));
 
 % Set IC
-[rho0,u0,v0,p0,tFinal,CFL] = Euler_IC1d(Xact,Yact,IC);
+[rho0,u0,v0,p0,tFinal,CFL] = Euler_IC2d(Xact,Yact,IC);
 E0 = p0./((gamma-1)*rho0)+0.5*(u0.^2+v0.^2);  % Total Energy density
 a0 = sqrt(gamma*p0./rho0);            % Speed of sound
 q0=reshape([rho0 rho0.*u0 rho0.*v0 rho0.*E0],nx,ny,4);        % vec. of conserved properties
@@ -105,8 +107,11 @@ while t<tFinal
     % Update time and iteration counter
 	t=t+dt; it=it+1;
 
+    if(mod(it,100)==0)
+        display(['t=',num2str(t),', iterations=',num2str(it)]);
+    end
 
-    cla;fdisplay(Xact,Yact,rho);title(['t=' num2str(t)]); id=id+1;
+%     cla;fdisplay(Xact,Yact,rho);title(['t=' num2str(t)]); id=id+1;
 %     pause(0.001)
 %     print(['./plots/',num2str(id)],'-dpng')
 

@@ -1,6 +1,6 @@
 function [] = fdisplay(X,Y,A)
 % h=surf(X,Y,A);
-h = contourf(X,Y,A,20);
+h = contour(X,Y,A,20);
 h2 = colorbar;
 % set(h2,'ylim',[0 1]);
 view(0,90);
