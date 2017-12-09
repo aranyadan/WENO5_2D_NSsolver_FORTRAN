@@ -68,30 +68,30 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     rho(1,:) = 1.0
     u(1,:) = 1.0
     v(1,:) = 0
-    E(1,:) = 1.0/(gamma-1.0) + 0.5 * u(1,:) * u(1,:)
+    p(1,:) = 1.0
 
     ! Upper Wall
     rho(:,n_y) = 1.0
     u(:,n_y) = 1.0
     v(:,n_y) = 0
-    E(:,n_y) = 1.0/(gamma-1.0) + 0.5 * u(:,n_y) * u(:,n_y)
+    p(:,n_y) = 1.0
 
     ! Lower wall
     temp = NINT(0.3*n_x)
 
-    ! rho(temp:n_x,2) = 1.0
-    u(1:temp-1,1) = u(1:temp-1,2)
-    u(temp:n_x,1) = -1.0 * u(temp:n_x,2)
+    u(1:temp,1) = u(1:temp,2)
+    u(temp+1:n_x,1) = -1.0 * u(temp+1:n_x,2)
 
     v(:,1) = -1.0 * v(:,2)
-    E(:,1) = E(:,2)
-    rho(:,1) = rho(:,2)
+    p(:,1) = p(:,2)
+    rho(:,1) = (rho(:,2)/p(:,2))*p(:,1)
 
     ! Outflow
     u(n_x,:) = u(n_x-1,:)
     v(n_x,:) = v(n_x-1,:)
-    E(n_x,:) = E(n_x-1,:)
-    rho(n_x,:) = rho(n_x-1,:)
+    p(n_x,:) = p(n_x-1,:)
+    ! rho(n_x,:) = rho(n_x-1,:)
+    rho(n_x,:) = (rho(n_x-1,:)/p(n_x-1,:))*p(n_x,:)
 
   case(7)
     ! Reflection
@@ -114,9 +114,9 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     p(:,1) = (p(:,2)/rho(:,2))*rho(:,1)
 
 
-    E = p/((gamma-1.0)*rho) + 0.5*(u**2+v**2)
   end select
 
+  E = p/((gamma-1.0)*rho) + 0.5*(u**2+v**2)
   q(:,:,1) = rho(:,:)
   q(:,:,2) = rho(:,:)*u(:,:)
   q(:,:,3) = rho(:,:)*v(:,:)
