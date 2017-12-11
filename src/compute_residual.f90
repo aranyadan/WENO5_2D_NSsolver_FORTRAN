@@ -8,7 +8,7 @@ subroutine compute_residual(q,qo,residual,n_x,n_y)
   call primitives(q,n_x,n_y,rho,u,v,E,p,a)
   call primitives(qo,n_x,n_y,rho,u2,v,E,p,a)
   do dim=1,1
-    res(dim) = MAXVAL(MAXVAL(ABS(u-u2),1));
+    res(dim) = SUM(ABS(u-u2))/(MAX(1,size(u)));
   end do
   residual = res(1);
 
