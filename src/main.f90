@@ -4,16 +4,15 @@
 
 ! Main file
 program main
-  use flux
   use saver
   use transform
   implicit none
-  ! Plot values: 1=velocity, 2=pressure, 3=density 4=Mach number
-  integer,parameter :: n_x = 151, n_y = 151, SAVE=1,PLOT=1,PLOTVAL=1,VIDEO=0, QUIET=1
+  ! Plot values: 1=u velocity, 2=v vel, 3=pressure, 4=density, 5=Temp
+  integer,parameter :: n_x = 151, n_y = 151, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0, QUIET=1
   real, parameter :: starty = 0, endy = 0.3, startx = 0, endx = 3, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
   real :: Pr
-  integer :: I,id=0,check,case_id=6,skips=1000
+  integer :: I,id=0,check,case_id=7,skips=50
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
@@ -71,9 +70,9 @@ program main
     ! RK 1st step
     call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
-    dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
+    dF = ((hp - cshift(hp,-1,1)) + (hn - cshift(hn,-1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
-    dG = ((hp - turn(hp,n_x,n_y,1,2)) + (hn - turn(hn,n_x,n_y,1,2)))/dely
+    dG = ((hp - cshift(hp,-1,2)) + (hn - cshift(hn,-1,2)))/dely
     dL = dF + dG
 
     q = qo - dt*dL
@@ -83,9 +82,9 @@ program main
     ! RK 2nd step
     call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
-    dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
+    dF = ((hp - cshift(hp,-1,1)) + (hn - cshift(hn,-1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
-    dG = ((hp - turn(hp,n_x,n_y,1,2)) + (hn - turn(hn,n_x,n_y,1,2)))/dely
+    dG = ((hp - cshift(hp,-1,2)) + (hn - cshift(hn,-1,2)))/dely
     dL = dF + dG
 
     q = 0.75*qo + 0.25*( q - dt*dL)
@@ -95,9 +94,9 @@ program main
     ! RK 3rd step
     call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
-    dF = ((hp - turn(hp,n_x,n_y,1,1)) + (hn - turn(hn,n_x,n_y,1,1)))/delx
+    dF = ((hp - cshift(hp,-1,1)) + (hn - cshift(hn,-1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
-    dG = ((hp - turn(hp,n_x,n_y,1,2)) + (hn - turn(hn,n_x,n_y,1,2)))/dely
+    dG = ((hp - cshift(hp,-1,2)) + (hn - cshift(hn,-1,2)))/dely
     dL = dF + dG
 
     q = (qo + 2.0*( q - dt*dL))/3.0
@@ -123,7 +122,7 @@ program main
     ! if(PLOT==1) then
     !   check=plot_data(q,x,y,n_x,n_y,t,id,PLOTVAL)
     !   id=id+1
-    if(SAVE==1 .AND. (MOD(id,skips)==0 .OR. t==tend ))then
+    if(SAVE==1 .AND. ((skips==0 .OR. MOD(id,skips)==0) .OR. t==tend ))then
       check=save_data(q,x,y,n_x,n_y,t,id)
       ! if(MOD(id,20)==0) then
       !   write( *, '(a,i4,a,f6.4,a,f6.4)')'Written file id: ', id,'    Time = ',t,'/',tend

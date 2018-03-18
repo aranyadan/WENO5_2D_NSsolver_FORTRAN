@@ -1,5 +1,4 @@
 subroutine WENO52d(lambda,F,q,n_x,n_y,hp,hn,dir)
-  use flux
   use transform
   implicit none
   integer :: n_x,i,j,dir,k,n_y

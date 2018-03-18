@@ -1,5 +1,4 @@
 subroutine WENO(lambda,F,q,R_i,Rinv_i,hp_i,hn_i)
-  use flux
   implicit none
   real,dimension(1,4) :: u,v,umm,um,up,upp,vmm,vm,vp,vpp,p0n,p1n,p2n,B0n,B1n
   real,dimension(1,4) :: B2n,alpha0n,alpha1n,alpha2n,alphasumn,w0n,w1n,w2n,hn
