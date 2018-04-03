@@ -5,7 +5,7 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
   real, dimension(n_x) :: x
   real, dimension(n_y) :: y
   real :: Cv, gamma=1.4
-  integer :: n_x,n_y,case_id, temp
+  integer :: n_x,n_y,case_id, temp,skipend=0
 
   call primitives(q,n_x,n_y,rho,u,v,E,p,a)
 
@@ -35,6 +35,7 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     q(n_x,:,:)=q(n_x-1,:,:)
     q(:,1,:)=q(:,2,:)
     q(:,n_y,:)=q(:,n_y-1,:)
+    skipend=1
 
   case(4)              ! Couette Flow
     u(:,n_y) = 1
@@ -115,12 +116,13 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
 
   end select
 
-  E = p/((gamma-1.0)*rho) + 0.5*(u**2+v**2)
-  q(:,:,1) = rho(:,:)
-  q(:,:,2) = rho(:,:)*u(:,:)
-  q(:,:,3) = rho(:,:)*v(:,:)
-  q(:,:,4) = rho(:,:)*E(:,:)
-
+  if(skipend==0) then
+    E = p/((gamma -1.0)*rho) + 0.5*(u**2+v**2)
+    q(:,:,1) = rho(:,:)
+    q(:,:,2) = rho(:,:)*u(:,:)
+    q(:,:,3) = rho(:,:)*v(:,:)
+    q(:,:,4) = rho(:,:)*E(:,:)
+  endif
 
 
 
