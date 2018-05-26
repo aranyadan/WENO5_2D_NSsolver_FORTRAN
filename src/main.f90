@@ -8,11 +8,11 @@ program main
   use transform
   implicit none
   ! Plot values: 1=u velocity, 2=v vel, 3=pressure, 4=density, 5=Temp
-  integer,parameter :: n_x = 151, n_y = 151, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0, QUIET=1
-  real, parameter :: starty = 0, endy = 0.3, startx = 0, endx = 3, gamma = 1.4
+  integer,parameter :: n_x = 101, n_y = 101, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0, QUIET=1
+  real, parameter :: starty = 0, endy = 1.0, startx = 0, endx = 3.0, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
   real :: Pr
-  integer :: I,id=0,check,case_id=7,skips=50
+  integer :: I,id=0,check,case_id=7,skips=50,VISCOUS
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
@@ -34,8 +34,8 @@ program main
     print*,'Setting initial conditions'
   end if
 
-  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
-  call set_boundary(q_0,x,y,n_x,n_y,Cv,case_id)
+  call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
+  call set_boundary(q_0,x,y,n_x,n_y,t,Cv,case_id)
   if(QUIET==0) then
     print*,'Initial conditions Set'
   end if
@@ -68,7 +68,7 @@ program main
     qo = q
 
     ! RK 1st step
-    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
+    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g,VISCOUS)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
     dF = ((hp - cshift(hp,-1,1)) + (hn - cshift(hn,-1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
@@ -77,10 +77,10 @@ program main
 
     q = qo - dt*dL
 
-    call set_boundary(q,x,y,n_x,n_y,Cv,case_id)
+    call set_boundary(q,x,y,n_x,n_y,t,Cv,case_id)
 
     ! RK 2nd step
-    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
+    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g,VISCOUS)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
     dF = ((hp - cshift(hp,-1,1)) + (hn - cshift(hn,-1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
@@ -89,10 +89,10 @@ program main
 
     q = 0.75*qo + 0.25*( q - dt*dL)
 
-    call set_boundary(q,x,y,n_x,n_y,Cv,case_id)
+    call set_boundary(q,x,y,n_x,n_y,t,Cv,case_id)
 
     ! RK 3rd step
-    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g)
+    call build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,f,g,VISCOUS)
     call WENO52d(lambda,f,q,n_x,n_y,hp,hn,1)
     dF = ((hp - cshift(hp,-1,1)) + (hn - cshift(hn,-1,1)))/delx
     call WENO52d(lambda,g,q,n_x,n_y,hp,hn,2)
@@ -101,7 +101,7 @@ program main
 
     q = (qo + 2.0*( q - dt*dL))/3.0
 
-    call set_boundary(q,x,y,n_x,n_y,Cv,case_id)
+    call set_boundary(q,x,y,n_x,n_y,t,Cv,case_id)
 
     ! Extract primitive values
     call primitives(q,n_x,n_y,rho,u,v,E,p,a)

@@ -1,10 +1,10 @@
-subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
+subroutine set_boundary(q,x,y,n_x,n_y,t,Cv,case_id)
   real, dimension(n_x,n_y,4) :: q
   real,dimension(n_x,n_y) :: rho,u,v,E,p,a
   real, parameter :: PI = 4.0*ATAN(1.0)
   real, dimension(n_x) :: x
   real, dimension(n_y) :: y
-  real :: Cv, gamma=1.4
+  real :: Cv, gamma=1.4,sh_pos,t
   integer :: n_x,n_y,case_id, temp,skipend=0
 
   call primitives(q,n_x,n_y,rho,u,v,E,p,a)
@@ -107,6 +107,46 @@ subroutine set_boundary(q,x,y,n_x,n_y,Cv,case_id)
     v(n_x,:) = 0
     u(:,1) = 0
     v(:,1) = 0
+
+    !Adiabatic
+    p(1,:) = (p(2,:)/rho(2,:))*rho(1,:)
+    p(n_x,:) = (p(n_x-1,:)/rho(n_x-1,:))*rho(n_x,:)
+    p(:,1) = (p(:,2)/rho(:,2))*rho(:,1)
+
+  case(8)                 ! DMR
+    ! inflow
+    u(1,:) = 8.25*cos(PI/6.0)
+    v(1,:) = -8.25*sin(PI/6.0)
+    ! p(1,:) = 116.5
+    rho(1,:) = 8.0
+
+    !wall
+    sh_pos = 1.0/6.0 + (1.0+20.0*t)/(3.0**0.5)
+    do i=1,n_x
+      if(x(i)<1.0/6.0) then
+        u(i,1) = 8.25*cos(PI/6.0)
+        v(i,1) = -8.25*sin(PI/6.0)
+        p(i,1) = 116.5
+        rho(i,1) = 8.0
+      else
+        u(i,1) = -1.0*u(i,2)
+        v(i,1) = -1.0*v(i,2)
+        p(i,1) = p(i,2)
+        rho(i,1) = rho(i,2)
+      end if
+      if(x(i)<sh_pos) then
+        u(i,n_y) = 8.25*cos(PI/6.0)
+        v(i,n_y) = -8.25*sin(PI/6.0)
+        p(i,n_y) = 116.5
+        rho(i,n_y) = 8.0
+      else
+        u(i,1) = 0.0
+        v(i,1) = 0.0
+        p(i,1) = 1.0
+        rho(i,1) = 1.4
+      endif
+    end do
+
 
     !Adiabatic
     p(1,:) = (p(2,:)/rho(2,:))*rho(1,:)

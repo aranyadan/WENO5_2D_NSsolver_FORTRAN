@@ -1,14 +1,15 @@
-subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
+subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
   implicit none
-  integer :: n_x,n_y,mid_x,mid_y,i,j, case_id
+  integer :: n_x,n_y,mid_x,mid_y,i,j, case_id, VISCOUS
   real :: delx,del_y,gamma=1.4,tend,cfl,Re,Suth,p_ref,rho_ref,&
-          T_ref,R_gas_const=287.0,Cp,Cv,Pr
+          T_ref,R_gas_const=287.0,Cp,Cv,Pr,x0
   real, parameter :: PI = 4.0*ATAN(1.0)
   real, dimension(4) :: p,u,v,rho
   real,dimension(n_x,n_y,4) :: Prim,q
   real, dimension(n_x) :: x
   real, dimension(n_y) :: y
   real,dimension(n_x,n_y) :: E
+  VISCOUS=1
   select case (case_id)
   case (1)              ! Lid driven cavity
     tend = 0.56
@@ -146,7 +147,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     T_ref = p_ref / (rho_ref * R_gas_const);
     Cp = gamma * R_gas_const / (gamma-1);
     Cv = Cp - gamma;
-    Re = 200.0;
+    Re = 1000.0;
     Suth = 110.4/T_ref;
     Pr = 0.72
 
@@ -170,6 +171,35 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv)
     Prim(mid_x+1:n_x, :, 3) = p(2)
     Prim(mid_x+1:n_x, :, 4) = rho(2)
 
+  case(8)                 ! DMR
+    VISCOUS=0
+    tend = 0.2
+    cfl = 0.6
+    p_ref = 101325             ! Reference air pressure (N/m^2)
+    rho_ref= 1.225             ! Reference air density (kg/m^3)
+    T_ref = p_ref / (rho_ref * R_gas_const);
+    Cp = gamma * R_gas_const / (gamma-1);
+    Cv = Cp - gamma;
+    Re = 1000.0;
+    Suth = 110.4/T_ref;
+    Pr = 0.72
+
+    x0 = 1.0/6.0
+    do i=1,n_x
+      do j=1,n_y
+        if(x(i)< x0 + y(j)/( 3.0**0.5) ) then
+          Prim(i,j,1) = 8.25*cos(PI/6.0)
+          Prim(i,j,2) = -8.25*sin(PI/6.0)
+          Prim(i,j,3) = 116.5
+          Prim(i,j,4) = 8.0
+        else
+          Prim(i,j,1) = 0.0
+          Prim(i,j,2) = 0.0
+          Prim(i,j,3) = 1.0
+          Prim(i,j,4) = 1.4
+        end if
+      end do
+    end do
 
   end select
 
