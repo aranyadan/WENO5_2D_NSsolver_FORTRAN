@@ -48,6 +48,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
     end do
 
   case (3)              ! Reimann Problem
+    VISCOUS=0
     p =   (/ 1.5, 0.3,    0.029, 0.3    /)
     rho = (/ 1.5, 0.5323, 0.138, 0.5323 /)
     u =   (/ 0.0, 1.206,  1.206, 0.0    /)
