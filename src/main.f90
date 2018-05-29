@@ -43,7 +43,7 @@ program main
 
   q = q_0
   a_0 = SQRT(gamma*Prim_0(:,:,3)/Prim_0(:,:,4))
-  lambda_0 = MAXVAL(MAXVAL( ABS( Prim_0(:,:,1) ) + ABS( Prim_0(:,:,2)) +a_0,1))
+  lambda_0 =MAXVAL((/ MAXVAL(ABS(Prim_0(:,:,1)+a_0)) , MAXVAL(ABS(Prim_0(:,:,2)+a_0)) /))
   dt_0 = cfl * delta/lambda_0
 
   !! Solver Loop

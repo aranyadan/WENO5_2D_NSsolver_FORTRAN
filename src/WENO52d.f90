@@ -22,8 +22,8 @@ subroutine WENO52d(lambda,F,q,n_x,n_y,hp,hn,dir)
         q_h(1,:) = (qnew(i,j,:) + qnew(i+1,j,:))/2.0
 
         call primitives(q_h,1,1,rho,u,v,E,p,a)
-        R_i = Rcalc(u(1),a(1))
-        Rinv_i = Rinv(u(1),a(1))
+        R_i = RFcalc(u(1),v(1),a(1))
+        Rinv_i = RFinv(u(1),v(1),a(1))
         call WENO(lambda,F_i,q_i,R_i,Rinv_i,hpr,hnr)
         hp(i,j,:) = hpr(1,:)
         hn(i,j,:) = hnr(1,:)
@@ -38,8 +38,8 @@ subroutine WENO52d(lambda,F,q,n_x,n_y,hp,hn,dir)
         q_h(1,:) = (qnew(i,j,:) + qnew(i,j+1,:))/2.0
 
         call primitives(q_h,1,1,rho,u,v,E,p,a)
-        R_i = Rcalc(u(1),a(1))
-        Rinv_i = Rinv(u(1),a(1))
+        R_i = RGcalc(u(1),v(1),a(1))
+        Rinv_i = RGinv(u(1),v(1),a(1))
         call WENO(lambda,F_i,q_i,R_i,Rinv_i,hpr,hnr)
         hp(i,j,:) = hpr(1,:)
         hn(i,j,:) = hnr(1,:)

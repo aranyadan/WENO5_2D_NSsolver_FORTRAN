@@ -1,53 +1,152 @@
 module transform
   implicit none
+  integer :: unitR=0
 
 contains
-  function Rinv(u,a)
-    real,dimension(4,4) :: Rinv
-    real :: u,a
+  function RFinv(u,v,a)
+    real,dimension(4,4) :: RFinv
+    real :: u,v,a,q2
     real :: gamma = 1.4
 
-  ! Rinv(1,1) = ((gamma - 1)/4)*u*u/(a*a) + u/(2*a)
-  ! Rinv(2,1) = 1 - ((gamma - 1)/2) * u*u/(a*a)
-  ! Rinv(3,1) = ((gamma - 1)/4)*u*u/(a*a) - u/(2*a)
-  !
-  ! Rinv(1,2) = -1 * ( ((gamma - 1)/2)*u/(a*a) + 1/(2*a))
-  ! Rinv(2,2) = (gamma - 1)*u/(a*a)
-  ! Rinv(3,2) = -1 * ( ((gamma - 1)/2)*u/(a*a) - 1/(2*a))
-  !
-  ! Rinv(1,3) = ((gamma - 1)/(2*a*a))
-  ! Rinv(2,3) = -1*((gamma - 1)/(a*a))
-  ! Rinv(3,3) = ((gamma - 1)/(2*a*a))
+    q2=0.5*(u*u+v*v)
 
-    Rinv(1,:) = (/1,0,0,0/) !
-    Rinv(2,:) = (/0,1,0,0/) !
-    Rinv(3,:) = (/0,0,1,0/) !
-    Rinv(4,:) = (/0,0,0,1/) !
+    RFinv(1,1) = ((gamma-1.0)*q2 + a*u)/(2.0*a*a)
+    RFinv(2,1) = (a*a - (gamma-1.0)*q2)/(a*a)
+    RFinv(3,1) = ((gamma-1.0)*q2 - a*u)/(2.0*a*a)
+    RFinv(4,1) = v
 
-  end function Rinv
+    RFinv(1,2) = ((1.0-gamma)*u - a)/(2.0*a*a)
+    RFinv(2,2) = ((gamma-1.0)*u)/(a*a)
+    RFinv(3,2) = ((1.0-gamma)*u + a)/(2.0*a*a)
+    RFinv(4,2) = 0.0
 
+    RFinv(1,3) = ((1.0-gamma)*v)/(2.0*a*a)
+    RFinv(2,3) = ((gamma-1.0)*v)/(a*a)
+    RFinv(3,3) = ((1.0-gamma)*v)/(2.0*a*a)
+    RFinv(4,3) = -1.0
 
-  function Rcalc(u,a)
-    real,dimension(4,4) :: Rcalc
+    RFinv(1,4) = (gamma-1.0)/(2.0*a*a)
+    RFinv(2,4) = (1.0-gamma)/(a*a)
+    RFinv(3,4) = (gamma-1.0)/(2.0*a*a)
+    RFinv(4,4) = 0.0
+
+    if(unitR==1) then
+      RFinv(1,:) = (/1,0,0,0/) !
+      RFinv(2,:) = (/0,1,0,0/) !
+      RFinv(3,:) = (/0,0,1,0/) !
+      RFinv(4,:) = (/0,0,0,1/) !
+    endif
+
+  end function RFinv
+
+  function RFcalc(u,v,a)
+    real,dimension(4,4) :: RFcalc
     real :: gamma = 1.4
-    real :: u,a
+    real :: u,v,a,q2
 
-    ! Rcalc(1,1) = 1
-    ! Rcalc(2,1) = u-a
-    ! Rcalc(3,1) = a*a/(gamma - 1) + 0.5*u*u - u*a
-    !
-    ! Rcalc(1,2) = 1
-    ! Rcalc(2,2) = u
-    ! Rcalc(3,2) = 0.5*u*u
-    !
-    ! Rcalc(1,3) = 1
-    ! Rcalc(2,3) = u+a
-    ! Rcalc(3,3) = a*a/(gamma - 1) + 0.5*u*u + u*a
+    q2=0.5*(u*u+v*v)
 
-    Rcalc(1,:) = (/1,0,0,0/) !
-    Rcalc(2,:) = (/0,1,0,0/) !
-    Rcalc(3,:) = (/0,0,1,0/) !
-    Rcalc(4,:) = (/0,0,0,1/) !
+    RFcalc(1,1) = 1.0
+    RFcalc(2,1) = u-a
+    RFcalc(3,1) = v
+    RFcalc(4,1) = a*a/(gamma - 1) + q2 - u*a
 
-  end function Rcalc
+    RFcalc(1,2) = 1.0
+    RFcalc(2,2) = u
+    RFcalc(3,2) = v
+    RFcalc(4,2) = q2
+
+    RFcalc(1,3) = 1.0
+    RFcalc(2,3) = u+a
+    RFcalc(3,3) = v
+    RFcalc(4,3) = a*a/(gamma - 1) + q2 + u*a
+
+    RFcalc(1,4) = 0.0
+    RFcalc(2,4) = 0.0
+    RFcalc(3,4) = -1.0
+    RFcalc(4,4) = -v
+
+    if(unitR==1) then
+      RFcalc(1,:) = (/1,0,0,0/) !
+      RFcalc(2,:) = (/0,1,0,0/) !
+      RFcalc(3,:) = (/0,0,1,0/) !
+      RFcalc(4,:) = (/0,0,0,1/) !
+    endif
+
+  end function RFcalc
+
+
+  function RGinv(u,v,a)
+    real,dimension(4,4) :: RGinv
+    real :: u,v,a,q2
+    real :: gamma = 1.4
+
+    q2 = 0.5*(u*u+v*v)
+
+    RGinv(1,1) = ((gamma-1.0)*q2 + a*v)/(2.0*a*a)
+    RGinv(2,1) = (a*a - (gamma-1.0)*q2)/(a*a)
+    RGinv(3,1) = ((gamma-1.0)*q2 - a*v)/(2.0*a*a)
+    RGinv(4,1) = -u
+
+    RGinv(1,2) = ((1.0-gamma)*u)/(2.0*a*a)
+    RGinv(2,2) = ((gamma-1.0)*u)/(a*a)
+    RGinv(3,2) = ((1.0-gamma)*u)/(2.0*a*a)
+    RGinv(4,2) = 1.0
+
+    RGinv(1,3) = ((1.0-gamma)*v - a)/(2.0*a*a)
+    RGinv(2,3) = ((gamma-1.0)*v)/(a*a)
+    RGinv(3,3) = ((1.0-gamma)*v + a)/(2.0*a*a)
+    RGinv(4,3) = 0.0
+
+
+    RGinv(1,4) = (gamma-1.0)/(2.0*a*a)
+    RGinv(2,4) = (1.0-gamma)/(a*a)
+    RGinv(3,4) = (gamma-1.0)/(2.0*a*a)
+    RGinv(4,4) = 0.0
+
+    if(unitR==1) then
+      RGinv(1,:) = (/1,0,0,0/) !
+      RGinv(2,:) = (/0,1,0,0/) !
+      RGinv(3,:) = (/0,0,1,0/) !
+      RGinv(4,:) = (/0,0,0,1/) !
+    endif
+
+  end function RGinv
+
+
+  function RGcalc(u,v,a)
+    real,dimension(4,4) :: RGcalc
+    real :: gamma = 1.4
+    real :: u,v,a,q2
+
+    q2 = 0.5*(u*u+v*v)
+
+    RGcalc(1,1) = 1.0
+    RGcalc(2,1) = u
+    RGcalc(3,1) = v-a
+    RGcalc(4,1) = a*a/(gamma - 1) + q2 - v*a
+
+    RGcalc(1,2) = 1.0
+    RGcalc(2,2) = u
+    RGcalc(3,2) = v
+    RGcalc(4,2) = q2
+
+    RGcalc(1,3) = 1.0
+    RGcalc(2,3) = u
+    RGcalc(3,3) = v+a
+    RGcalc(4,3) = a*a/(gamma - 1) + q2 + v*a
+
+    RGcalc(1,4) = 0.0
+    RGcalc(2,4) = 1.0
+    RGcalc(3,4) = 0.0
+    RGcalc(4,4) = u
+
+    if(unitR==1) then
+      RGcalc(1,:) = (/1,0,0,0/) !
+      RGcalc(2,:) = (/0,1,0,0/) !
+      RGcalc(3,:) = (/0,0,1,0/) !
+      RGcalc(4,:) = (/0,0,0,1/) !
+    endif
+
+  end function RGcalc
 end module transform
