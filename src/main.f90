@@ -9,10 +9,10 @@ program main
   implicit none
   ! Plot values: 1=u velocity, 2=v vel, 3=pressure, 4=density, 5=Temp
   integer,parameter :: n_x = 101, n_y = 101, SAVE=1,PLOT=1,PLOTVAL=4,VIDEO=0, QUIET=1
-  real, parameter :: starty = 0, endy = 1.0, startx = 0, endx = 3.0, gamma = 1.4
+  real, parameter :: starty = 0, endy = 1.0, startx = 0, endx = 1.0, gamma = 1.4
   real :: delx,dely,dt,cfl,tend,lambda_0,t,dt_0,lambda,delta,Re,Suth,residual,Cv
-  real :: Pr
-  integer :: I,id=0,check,case_id=7,skips=50,VISCOUS
+  real :: Pr,VISCOUS
+  integer :: I,id=0,check,case_id=3,skips=50
   real,dimension(n_x,n_y) :: a_0,p,rho,u,v,E,a                             ! Stores x coordinate of the points, primitive values
   real,dimension(n_x) :: x
   real,dimension(n_y) :: y
@@ -35,6 +35,7 @@ program main
   end if
 
   call IC2DReimann(Prim_0,q_0,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
+  print*,VISCOUS
   call set_boundary(q_0,x,y,n_x,n_y,t,Cv,case_id)
   if(QUIET==0) then
     print*,'Initial conditions Set'

@@ -1,15 +1,15 @@
 subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
   implicit none
-  integer :: n_x,n_y,mid_x,mid_y,i,j, case_id, VISCOUS
+  integer :: n_x,n_y,mid_x,mid_y,i,j, case_id
   real :: delx,del_y,gamma=1.4,tend,cfl,Re,Suth,p_ref,rho_ref,&
-          T_ref,R_gas_const=287.0,Cp,Cv,Pr,x0
+          T_ref,R_gas_const=287.0,Cp,Cv,Pr,x0,VISCOUS
   real, parameter :: PI = 4.0*ATAN(1.0)
   real, dimension(4) :: p,u,v,rho
   real,dimension(n_x,n_y,4) :: Prim,q
   real, dimension(n_x) :: x
   real, dimension(n_y) :: y
   real,dimension(n_x,n_y) :: E
-  VISCOUS=1
+  VISCOUS=1.0
   select case (case_id)
   case (1)              ! Lid driven cavity
     tend = 0.56
@@ -48,7 +48,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
     end do
 
   case (3)              ! Reimann Problem
-    VISCOUS=0
+    VISCOUS=0.0
     p =   (/ 1.5, 0.3,    0.029, 0.3    /)
     rho = (/ 1.5, 0.5323, 0.138, 0.5323 /)
     u =   (/ 0.0, 1.206,  1.206, 0.0    /)
@@ -148,7 +148,7 @@ subroutine IC2DReimann(Prim,q,n_x,n_y,x,y,case_id,tend,Re,Pr,Suth,Cv,VISCOUS)
     T_ref = p_ref / (rho_ref * R_gas_const);
     Cp = gamma * R_gas_const / (gamma-1);
     Cv = Cp - gamma;
-    Re = 1000.0;
+    Re = 200.0;
     Suth = 110.4/T_ref;
     Pr = 0.72
 

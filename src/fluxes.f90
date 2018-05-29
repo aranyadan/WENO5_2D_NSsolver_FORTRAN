@@ -1,6 +1,6 @@
 subroutine build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,F,G,VISCOUS)
-  integer :: n_x,n_y,VISCOUS
-  real :: gamma=1.4,Re,Suth,Pr
+  integer :: n_x,n_y
+  real :: gamma=1.4,Re,Suth,Pr,VISCOUS
   real, dimension(n_x,n_y,4) :: q,F, G
   real, dimension(n_x,n_y) :: u,v,p,rho,E,a,tauxx,tauxy,tauyy,q_x,q_y,T
   real, dimension(n_x,n_y,3) :: vel
@@ -8,7 +8,7 @@ subroutine build_flux(q,n_x,n_y,delx,dely,Re,Pr,Suth,F,G,VISCOUS)
   call primitives(q,n_x,n_y,rho,u,v,E,p,a)
   T = p/rho
 
-  if(VISCOUS==1) then
+  if(VISCOUS==1.0) then
     vel(:,:,1) = u(:,:)
     vel(:,:,2) = v(:,:)
     vel(:,:,3) = T(:,:)
